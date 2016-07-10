@@ -102,7 +102,7 @@ sub clear_all {
 
 sub generate {
     for ( 0 .. 3 ) {
-        my @books = glob "sources/*.txt";
+        my @books = glob "*.txt";
         my $filename;
 
         # Select book
