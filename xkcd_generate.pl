@@ -2,6 +2,9 @@
 # davem @ davem.cloud
 #
 # xkcd password, (c) 2016 -
+# 0.01 - initial release
+# 0.02 - minor improvements/fixes
+# 0.03 - compatible with both Fedora and CentOS (Math::Random lines)
 #
 # Sources:
 # https://xkcd.com/936/
@@ -17,10 +20,15 @@ use Modern::Perl;
 use Tie::File;
 use List::MoreUtils 'uniq';
 use Getopt::Long;
-use Math::Random::Secure 'irand';    # faster than rand
+
+# Pick one of these.  Some systems don't
+# have the first one (like CentOS), so use
+# the second one (MT::Auto).
+# use Math::Random::Secure 'irand';    # faster than rand
+# use Math::Random::MT::Auto 'irand';
 $| = 1;
 
-my $VERSION = '0.0.2';
+my $VERSION = '0.0.3';
 
 use Gtk3 '-init';
 use Glib 'TRUE', 'FALSE';
