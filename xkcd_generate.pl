@@ -5,6 +5,7 @@
 # 0.01 - initial release
 # 0.02 - minor improvements/fixes
 # 0.03 - compatible with both Fedora and CentOS (Math::Random lines)
+# 0.04 - change design and fix bugs
 #
 # Sources:
 # https://xkcd.com/936/
@@ -25,23 +26,22 @@ use Getopt::Long;
 # have the first one (like CentOS), so use
 # the second one (MT::Auto).
 # use Math::Random::Secure 'irand';    # faster than rand
-# use Math::Random::MT::Auto 'irand';
+use Math::Random::MT::Auto 'irand';
 $| = 1;
 
-my $VERSION = '0.0.3';
+my $VERSION = '0.0.4';
 
 use Gtk3 '-init';
 use Glib 'TRUE', 'FALSE';
 
 my $window = Gtk3::Window->new;
 $window->set_title( 'xkcd Phrase Generator' . "v $VERSION" );
-$window->set_border_width( 15 );
-# $window->set_default_size( 250, 250 );
+$window->set_border_width( 10 );
 $window->signal_connect( destroy => sub { Gtk3->main_quit } );
 
 my @final_books;
 
-my $box = Gtk3::Box->new( 'vertical', 5 );
+my $box = Gtk3::Box->new( 'vertical', 0 );
 $window->add( $box );
 
 my $entry_1 = Gtk3::Entry->new;
@@ -49,6 +49,7 @@ my $entry_2 = Gtk3::Entry->new;
 my $entry_3 = Gtk3::Entry->new;
 my $entry_4 = Gtk3::Entry->new;
 my $entry_5 = Gtk3::Entry->new;
+$entry_5->set_width_chars( 40 );
 
 my $use_numbers = 0;
 my $use_special = 0;
@@ -59,7 +60,7 @@ my $special_box = Gtk3::RadioButton->new_with_label( $numbers_box,
     'Use special characters' );
 $special_box->signal_connect( toggled => \&toggled, 2 );
 my $neither_box
-    = Gtk3::RadioButton->new_with_label( $numbers_box, 'Use neither' );
+    = Gtk3::RadioButton->new_with_label( $numbers_box, 'Just words' );
 $neither_box->signal_connect( toggled => \&toggled, 3 );
 $neither_box->set_active( TRUE );
 my $go_button = Gtk3::Button->new( 'Generate' );
@@ -76,24 +77,25 @@ my $grid = Gtk3::Grid->new;
 $box->pack_start( $grid, TRUE, TRUE, 5 );
 $grid->set_column_spacing( 5 );
 $grid->set_row_spacing( 15 );
-$grid->set_column_homogeneous( TRUE );
+$grid->set_column_homogeneous( FALSE );
 
-$grid->attach( $numbers_box, 0, 0, 1, 1 );
-$grid->attach( $special_box, 1, 0, 1, 1 );
-$grid->attach( $neither_box, 2, 0, 1, 1 );
-$grid->attach( $go_button,   3, 0, 1, 1 );
-$grid->attach( $quit_button, 4, 0, 1, 1 );
-
-$grid->attach( $entry_1, 0, 1, 1, 1 );
-$grid->attach( $entry_2, 1, 1, 1, 1 );
-$grid->attach( $entry_3, 2, 1, 1, 1 );
-$grid->attach( $entry_4, 3, 1, 1, 1 );
-$grid->attach( $entry_5, 4, 1, 1, 1 );
+$grid->attach( $entry_1, 0, 0, 1, 1 );
+$grid->attach( $entry_2, 0, 1, 1, 1 );
+$grid->attach( $entry_3, 0, 2, 1, 1 );
+$grid->attach( $entry_4, 0, 3, 1, 1 );
+$grid->attach( $entry_5, 0, 4, 1, 1 );
 
 my $final_label = Gtk3::Entry->new;
 $final_label->set_editable( FALSE );
-$grid->attach( $final_label, 0, 2, 2, 1 );
+$grid->attach( $final_label, 0, 5, 1, 1 );
 my $final_sofar = '';
+
+$grid->attach( $go_button,   0, 6, 1, 1 );
+$grid->attach( $quit_button, 1, 6, 1, 1 );
+
+$grid->attach( $numbers_box, 0, 7, 1, 1 );
+$grid->attach( $special_box, 0, 8, 1, 1 );
+$grid->attach( $neither_box, 0, 9, 1, 1 );
 
 $window->show_all;
 Gtk3->main();
@@ -141,6 +143,7 @@ sub generate {
             # Pick a random line from the book ($filename)
             my $rand_line = int( rand( $#array ) );
             my $line      = $array[ $rand_line ];
+
             # Skip it if it's blank
             next if ( $line =~ /^\s*$/ );
 
@@ -154,9 +157,9 @@ sub generate {
             next unless ( @words );
 
             # Pick a random word from the random line
-            my $rand_num = int( rand( $#words ) );
-            # warn "rand_num = >$rand_num<\n";
+            my $rand_num  = int( rand( $#words ) );
             my $rand_word = $words[ $rand_num ];
+
             # Skip it unless longer than 2 and shorter than 7 characters
             next if ( length( $rand_word ) < 3 );
             next if ( length( $rand_word ) > 8 );
@@ -164,7 +167,7 @@ sub generate {
 
             $rand_word =~ s/[^a-zA-Z]//g;
             $rand_word = ucfirst( lc( $rand_word ) );
-            # print ucfirst( $rand_word ), " ";
+
             if ( $_ == 0 ) {
                 $entry_1->set_text( $rand_word );
             } elsif ( $_ == 1 ) {
@@ -180,7 +183,8 @@ sub generate {
     }
     if ( $use_numbers ) {
         my $irand = irand( 100 ) + 1;
-        warn "adding number $irand\n";
+        $irand = sanity( $irand );
+        warn "adding number >$irand<\n";
         $entry_5->set_text( $irand );
         $final_sofar .= ' ' . $irand;
     } elsif ( $use_special ) {
@@ -215,4 +219,11 @@ sub toggled {
         $use_special = 0;
         $use_neither = 1;
     }
+}
+
+sub sanity {
+    my $seed = shift;
+    # For some reason, irand is returning huge numbers
+    # despite telling it to use 100 + 1
+    return substr( $seed, 0, 2 );
 }
