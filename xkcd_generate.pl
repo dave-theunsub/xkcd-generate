@@ -1,11 +1,12 @@
 #!/usr/bin/perl
-# davem @ davem.cloud
+# davem @ davem.io
 #
 # xkcd password, (c) 2016 -
-# 0.01 - initial release
-# 0.02 - minor improvements/fixes
-# 0.03 - compatible with both Fedora and CentOS (Math::Random lines)
-# 0.04 - change design and fix bugs
+# 0.0.1 - initial release
+# 0.0.2 - minor improvements/fixes
+# 0.0.3 - compatible with both Fedora and CentOS (Math::Random lines)
+# 0.0.4 - change design and fix bugs
+# 0.0.5 - add headerbar, remove $window title, remove unneeded warns
 #
 # Sources:
 # https://xkcd.com/936/
@@ -29,20 +30,27 @@ use Getopt::Long;
 use Math::Random::MT::Auto 'irand';
 $| = 1;
 
-my $VERSION = '0.0.4';
+my $VERSION = '0.0.5';
+my @final_books;
 
 use Gtk3 '-init';
 use Glib 'TRUE', 'FALSE';
 
 my $window = Gtk3::Window->new;
-$window->set_title( 'xkcd Phrase Generator' . "v $VERSION" );
+# $window->set_title( 'xkcd Phrase Generator' . "v $VERSION" );
 $window->set_border_width( 10 );
+$window->set_resizable( FALSE );
 $window->signal_connect( destroy => sub { Gtk3->main_quit } );
-
-my @final_books;
 
 my $box = Gtk3::Box->new( 'vertical', 0 );
 $window->add( $box );
+
+my $header = Gtk3::HeaderBar->new;
+$header->set_title( 'xkcd phrase generator' );
+$header->set_subtitle( " v $VERSION" );
+$header->set_show_close_button( TRUE );
+$header->set_decoration_layout( 'menu:minimize,close' );
+$window->set_titlebar( $header );
 
 my $entry_1 = Gtk3::Entry->new;
 my $entry_2 = Gtk3::Entry->new;
@@ -120,7 +128,6 @@ sub generate {
             my $rand_book = int( rand( scalar( @books ) ) );
             $filename = $books[ $rand_book ];
             push( @final_books, $filename );
-            warn "added $filename to sources\n";
         } else {
             $filename = 'nounlist.txt';
             push( @final_books, $filename );
@@ -128,7 +135,6 @@ sub generate {
 
         # Words to skip
         my @skip = ( 'the', 'you', 'and' );
-        warn "skipping words ", join( ',', @skip ), "\n";
 
         # Open the random book
         # open( my $f, '<', $books[ $rand_book ] );
@@ -136,8 +142,6 @@ sub generate {
         my @array;
         tie @array, 'Tie::File', $filename
             or die "Can't open $filename: $!\n";
-
-        warn "using $filename which has ", scalar @array, " lines\n";
 
         while ( 1 ) {
             # Pick a random line from the book ($filename)
@@ -160,13 +164,12 @@ sub generate {
             my $rand_num  = int( rand( $#words ) );
             my $rand_word = $words[ $rand_num ];
 
+            $rand_word =~ s/[^a-zA-Z]//g;
+            $rand_word = ucfirst( lc( $rand_word ) );
+
             # Skip it unless longer than 2 and shorter than 7 characters
             next if ( length( $rand_word ) < 3 );
             next if ( length( $rand_word ) > 8 );
-            warn "selected word $rand_word\n";
-
-            $rand_word =~ s/[^a-zA-Z]//g;
-            $rand_word = ucfirst( lc( $rand_word ) );
 
             if ( $_ == 0 ) {
                 $entry_1->set_text( $rand_word );
@@ -184,7 +187,6 @@ sub generate {
     if ( $use_numbers ) {
         my $irand = irand( 100 ) + 1;
         $irand = sanity( $irand );
-        warn "adding number >$irand<\n";
         $entry_5->set_text( $irand );
         $final_sofar .= ' ' . $irand;
     } elsif ( $use_special ) {
@@ -192,12 +194,10 @@ sub generate {
         my @special = ( '!', '#', '$', '%', '^', '&' );
         for ( 0 .. 1 ) {
             $special_string .= $special[ int( rand( @special ) ) ];
-            warn "adding character $special_string\n";
         }
         $entry_5->set_text( $special_string );
         $final_sofar .= ' ' . $special_string;
     } elsif ( $use_neither ) {
-        warn "not using numbers or special characters\n";
         $entry_5->set_text( '' );
     }
     $final_label->set_text( $final_sofar );
@@ -222,8 +222,8 @@ sub toggled {
 }
 
 sub sanity {
-    my $seed = shift;
+    my $bignum = shift;
     # For some reason, irand is returning huge numbers
     # despite telling it to use 100 + 1
-    return substr( $seed, 0, 2 );
+    return substr( $bignum, 0, 2 );
 }
