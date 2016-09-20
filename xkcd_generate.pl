@@ -18,7 +18,6 @@
 
 use strict;
 use warnings;
-use Modern::Perl;
 use Tie::File;
 use List::MoreUtils 'uniq';
 use Getopt::Long;
