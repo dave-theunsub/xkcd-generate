@@ -1,14 +1,6 @@
 #!/usr/bin/perl
 # davem @ davem.io
 #
-# xkcd password, (c) 2016 -
-# 0.0.1 - initial release
-# 0.0.2 - minor improvements/fixes
-# 0.0.3 - compatible with both Fedora and CentOS (Math::Random lines)
-# 0.0.4 - change design and fix bugs
-# 0.0.5 - add headerbar, remove $window title, remove unneeded warns
-# 0.0.6 - add keyboard shortcuts for Explain, About, and Quit - with images
-#
 # Sources:
 # https://xkcd.com/936/
 # Project Gutenberg: https://www.gutenberg.org
