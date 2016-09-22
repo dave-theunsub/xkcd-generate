@@ -7,6 +7,7 @@
 # 0.0.3 - compatible with both Fedora and CentOS (Math::Random lines)
 # 0.0.4 - change design and fix bugs
 # 0.0.5 - add headerbar, remove $window title, remove unneeded warns
+# 0.0.6 - add keyboard shortcuts for Explain, About, and Quit - with images
 #
 # Sources:
 # https://xkcd.com/936/
@@ -29,14 +30,14 @@ use Getopt::Long;
 use Math::Random::MT::Auto 'irand';
 $| = 1;
 
-my $VERSION = '0.0.5';
+my $VERSION = '0.0.6';
 my @final_books;
+my $book_location = '/usr/share/doc/xkcd_generate';
 
 use Gtk3 '-init';
 use Glib 'TRUE', 'FALSE';
 
 my $window = Gtk3::Window->new;
-# $window->set_title( 'xkcd Phrase Generator' . "v $VERSION" );
 $window->set_border_width( 10 );
 $window->set_resizable( FALSE );
 $window->signal_connect( destroy => sub { Gtk3->main_quit } );
@@ -50,6 +51,13 @@ $header->set_subtitle( " v $VERSION" );
 $header->set_show_close_button( TRUE );
 $header->set_decoration_layout( 'menu:minimize,close' );
 $window->set_titlebar( $header );
+
+my $about_btn = Gtk3::Button->new_from_icon_name( 'gtk-about', 3 );
+$about_btn->signal_connect( 'clicked' => \&about );
+$header->pack_start( $about_btn );
+my $info_btn = Gtk3::Button->new_from_icon_name( 'gtk-help', 3 );
+$info_btn->signal_connect( 'clicked' => \&explain );
+$header->pack_start( $info_btn );
 
 my $entry_1 = Gtk3::Entry->new;
 my $entry_2 = Gtk3::Entry->new;
@@ -104,6 +112,19 @@ $grid->attach( $numbers_box, 0, 7, 1, 1 );
 $grid->attach( $special_box, 0, 8, 1, 1 );
 $grid->attach( $neither_box, 0, 9, 1, 1 );
 
+# Keyboard shortcuts
+my $ui_info = get_ui_info();
+my @entries = get_pseudo_keys();
+
+my $actions = Gtk3::ActionGroup->new( 'Actions' );
+$actions->add_actions( \@entries, undef );
+
+my $ui = Gtk3::UIManager->new;
+$ui->insert_action_group( $actions, 0 );
+
+$window->add_accel_group( $ui->get_accel_group );
+$ui->add_ui_from_string( $ui_info );
+
 $window->show_all;
 Gtk3->main();
 
@@ -119,7 +140,8 @@ sub clear_all {
 
 sub generate {
     for ( 0 .. 3 ) {
-        my @books = glob "*.txt";
+        my @books = glob "$book_location/*.txt";
+        push( @books, $_ ) for ( glob "$book_location/*.dic" );
         my $filename;
 
         # Select book
@@ -128,7 +150,7 @@ sub generate {
             $filename = $books[ $rand_book ];
             push( @final_books, $filename );
         } else {
-            $filename = 'nounlist.txt';
+            $filename = "$book_location/nounlist.txt";
             push( @final_books, $filename );
         }
 
@@ -139,7 +161,8 @@ sub generate {
         # open( my $f, '<', $books[ $rand_book ] );
 
         my @array;
-        tie @array, 'Tie::File', $filename
+        use Fcntl 'O_RDONLY';
+        tie @array, 'Tie::File', $filename, mode => O_RDONLY
             or die "Can't open $filename: $!\n";
 
         while ( 1 ) {
@@ -225,4 +248,92 @@ sub sanity {
     # For some reason, irand is returning huge numbers
     # despite telling it to use 100 + 1
     return substr( $bignum, 0, 2 );
+}
+
+sub get_ui_info {
+    return "<ui>
+  <menubar name='MenuBar'>
+      <menuitem action='About'/>
+      <menuitem action='Explain'/>
+      <separator/>
+      <menuitem action='Quit'/>
+  </menubar>
+</ui>";
+}
+
+sub get_pseudo_keys {
+    #<<<
+    my @entries = (
+        [
+           'About', undef,
+           'About', '<control>A',
+           undef, \&about,
+           FALSE
+        ],
+        [
+           'Explain', undef,
+           'Explain', '<control>E',
+           undef, \&explain,
+           FALSE
+        ],
+        [
+           'Quit', undef,
+           'Quit', '<control>X',
+           undef, sub { Gtk3->main_quit },
+           FALSE
+        ],
+    );
+    #>>>
+    return @entries;
+}
+
+sub explain {
+    my $images_dir = '/usr/share/pixmaps';
+    my $icon       = "$images_dir/xkcd-password_strength.png";
+    my $image      = Gtk3::Image->new_from_file( $icon );
+    my $box        = Gtk3::Box->new( 'horizontal', 5 );
+    $box->add( $image );
+
+    my $dialogbox = Gtk3::Dialog->new;
+    $dialogbox->set_title( 'xkcd comic explanation' );
+    $dialogbox->get_content_area()->add( $box );
+    $dialogbox->show_all;
+
+    $dialogbox->run;
+    $dialogbox->destroy;
+}
+
+sub about {
+    my $dialog = Gtk3::AboutDialog->new;
+    $dialog->set_title( 'About' );
+    my $license
+        = 'This is free software; you can redistribute it and/or'
+        . ' modify it under the terms of either:'
+        . ' a) the GNU GPL as published by the Free'
+        . ' Software Foundation; version 1, or (at your option)'
+        . ' any later version, or'
+        . ' b) the "Artistic License".';
+    $dialog->set_wrap_license( TRUE );
+
+    my $images_dir = '/usr/share/pixmaps';
+    my $icon       = "$images_dir/xkcd-5-dollar-wrench.png";
+    my $pixbuf     = Gtk3::Gdk::Pixbuf->new_from_file( $icon );
+
+    $dialog->set_logo( $pixbuf );
+    $dialog->set_version( $VERSION );
+    $dialog->set_license( $license );
+    $dialog->set_wrap_license( TRUE );
+    $dialog->set_website_label( 'Homepage' );
+    $dialog->set_logo( $pixbuf );
+    $dialog->set_program_name( 'xkcd generate' );
+    $dialog->set_authors( [ 'Dave M', 'davem @ davem.io' ] );
+    $dialog->set_comments(
+              'This program creates passphrases from novels to be used '
+            . 'for authentication.  It is much easier to remember '
+            . 'and harder to break short, non-sensical passphrases '
+            . 'than to remember a long series of characters (which is '
+            . 'also easier to break than the phrases).' );
+
+    $dialog->run;
+    $dialog->destroy;
 }
