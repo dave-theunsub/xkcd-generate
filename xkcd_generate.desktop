@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=xkcd passphrase generator
+GenericName=xkcd generator
+Comment=Generate secure passphrases
+TryExec=xkcd_generate.pl
+Exec=xkcd_generate.pl
+Icon=xkcd-5-dollar-wrench.png
+Type=Application
+Terminal=false
+Categories=GTK;GNOME;Utility;
+StartupNotify=true
+Keywords=password;passphrase;
