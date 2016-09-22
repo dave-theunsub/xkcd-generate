@@ -4,4 +4,23 @@ This program uses source material from Project Gutenberg.
 See the license information here:
 https://www.gutenberg.org/wiki/Gutenberg:The_Project_Gutenberg_License
 
+The following are used as part of this program:
+1984.txt    = 1984, George Orwell
+pg11.txt    = Alice's Adventures in Wonderland, Lewis Carroll
+pg1342.txt  = Pride and Prejudice, Jane Austen
+pg15141.txt = Beethoven, by George Alexander Fischer
+pg244.txt   = A Study In Scarlet, by Arthur Conan Doyle
+pg2591.txt  = Grimms' Fairy Tales, by The Brothers Grimm
+pg8800.txt  = The Divine Comedy, Complete, by Dante Alighieri
+
 This program also uses information from freely available dictionaries.
+
+GUI by Dave M, 2016 -
+All rights reserved.  This program is free software; you can
+redistribute it and/or modify it under the terms of either:
+
+a) the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option)
+any later version, or
+
+b) the "Artistic License".
