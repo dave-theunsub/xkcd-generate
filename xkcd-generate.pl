@@ -24,7 +24,9 @@ $| = 1;
 
 my $VERSION = '0.0.6';
 my @final_books;
-my $book_location = '/usr/share/doc/xkcd_generate';
+
+# We'll keep this up here to ensure folks can change it if need be
+my $book_location = '/usr/share/doc/xkcd-generate';
 
 use Gtk3 '-init';
 use Glib 'TRUE', 'FALSE';
