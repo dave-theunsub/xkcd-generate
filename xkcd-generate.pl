@@ -48,10 +48,16 @@ $window->set_titlebar( $header );
 
 my $about_btn = Gtk3::Button->new_from_icon_name( 'gtk-about', 3 );
 $about_btn->signal_connect( 'clicked' => \&about );
+$about_btn->set_tooltip_text( 'About <ctrl-A>' );
 $header->pack_start( $about_btn );
 my $info_btn = Gtk3::Button->new_from_icon_name( 'gtk-help', 3 );
 $info_btn->signal_connect( 'clicked' => \&explain );
+$info_btn->set_tooltip_text( 'Explain <ctrl-E>' );
 $header->pack_start( $info_btn );
+my $quit_btn = Gtk3::Button->new_from_icon_name( 'gtk-quit', 3 );
+$quit_btn->signal_connect( 'clicked' => sub { Gtk3->main_quit } );
+$quit_btn->set_tooltip_text( 'Quit <ctrl-Q>' );
+$header->pack_start( $quit_btn );
 
 my $entry_1 = Gtk3::Entry->new;
 my $entry_2 = Gtk3::Entry->new;
@@ -72,15 +78,22 @@ my $neither_box
     = Gtk3::RadioButton->new_with_label( $numbers_box, 'Just words' );
 $neither_box->signal_connect( toggled => \&toggled, 3 );
 $neither_box->set_active( TRUE );
-my $go_button = Gtk3::Button->new( 'Generate' );
-$go_button->signal_connect(
+
+# Button for generating
+my $go_btn = Gtk3::Button->new( 'Generate' );
+$go_btn->signal_connect(
     clicked => sub {
         clear_all();
         generate();
     }
 );
-my $quit_button = Gtk3::Button->new( 'Quit' );
-$quit_button->signal_connect( clicked => sub { Gtk3->main_quit } );
+
+# Button for storing $final_label text in clipboard
+my $clippy
+    = Gtk3::Clipboard::get( Gtk3::Gdk::Atom::intern( 'CLIPBOARD', FALSE ) );
+$clippy->wait_for_text();
+my $copy_btn = Gtk3::Button->new_from_icon_name( 'gtk-copy', 3 );
+$copy_btn->set_tooltip_text( 'Copy phrase <ctrl-C>' );
 
 my $grid = Gtk3::Grid->new;
 $box->pack_start( $grid, TRUE, TRUE, 5 );
@@ -99,12 +112,14 @@ $final_label->set_editable( FALSE );
 $grid->attach( $final_label, 0, 5, 1, 1 );
 my $final_sofar = '';
 
-$grid->attach( $go_button,   0, 6, 1, 1 );
-$grid->attach( $quit_button, 1, 6, 1, 1 );
+$grid->attach( $go_btn,   0, 6, 1, 1 );
+$grid->attach( $copy_btn, 1, 6, 1, 1 );
 
 $grid->attach( $numbers_box, 0, 7, 1, 1 );
 $grid->attach( $special_box, 0, 8, 1, 1 );
 $grid->attach( $neither_box, 0, 9, 1, 1 );
+
+$copy_btn->signal_connect( clicked => \&copy );
 
 # Keyboard shortcuts
 my $ui_info = get_ui_info();
@@ -154,8 +169,9 @@ sub generate {
         # Open the random book
         # open( my $f, '<', $books[ $rand_book ] );
 
-        my @array;
+        # Open books in read only mode or tie fails
         use Fcntl 'O_RDONLY';
+        my @array;
         tie @array, 'Tie::File', $filename, mode => O_RDONLY
             or die "Can't open $filename: $!\n";
 
@@ -248,6 +264,7 @@ sub get_ui_info {
     return "<ui>
   <menubar name='MenuBar'>
       <menuitem action='About'/>
+      <menuitem action='Copy'/>
       <menuitem action='Explain'/>
       <separator/>
       <menuitem action='Quit'/>
@@ -262,6 +279,12 @@ sub get_pseudo_keys {
            'About', undef,
            'About', '<control>A',
            undef, \&about,
+           FALSE
+        ],
+        [
+           'Copy', undef,
+           'Copy', '<control>C',
+           undef, \&copy,
            FALSE
         ],
         [
@@ -295,6 +318,34 @@ sub explain {
 
     $dialogbox->run;
     $dialogbox->destroy;
+}
+
+sub copy {
+    return unless length( $final_label->get_text );
+    #$clippy->set_text( $final_label->get_text, length( $final_label ) );
+    if ( length( $final_sofar ) ) {
+        $clippy->set_text( $final_sofar, length( $final_sofar ) );
+    } elsif ( length( $final_label->get_text ) ) {
+        $clippy->set_text( $final_label->get_text, length( $final_label ) );
+    } else {
+        warn "nothing in clipboard\n";
+        return;
+    }
+    my $pop = Gtk3::Popover->new( $label );
+    $pop->set_position( 'right' );
+    $pop->set_relative_to( $final_label );
+    $pop->show;
+    my $loop = Glib::MainLoop->new;
+    Glib::Timeout->add(
+        1000,
+        sub {
+            $loop->quit;
+            FALSE;
+        }
+    );
+    $loop->run;
+    # $pop->popdown;  # Not until 3.22
+    $pop->hide;
 }
 
 sub about {
