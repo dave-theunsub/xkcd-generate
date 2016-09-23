@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# davem @ davem.io
+# Dave M <dave.nerd @ gmail>
 #
 # Sources:
 # https://xkcd.com/936/
@@ -317,10 +317,11 @@ sub about {
     $dialog->set_version( $VERSION );
     $dialog->set_license( $license );
     $dialog->set_wrap_license( TRUE );
+    $dialog->set_website( 'https://github.com/dave-theunsub/xkcd-generate' );
     $dialog->set_website_label( 'Homepage' );
     $dialog->set_logo( $pixbuf );
     $dialog->set_program_name( 'xkcd generate' );
-    $dialog->set_authors( [ 'Dave M', 'davem @ davem.io' ] );
+    $dialog->set_authors( [ 'Dave M', 'dave.nerd @ gmail' ] );
     $dialog->set_comments(
               'This program creates passphrases from novels to be used '
             . 'for authentication.  It is much easier to remember '
