@@ -1,9 +1,9 @@
 [Desktop Entry]
 Name=xkcd passphrase generator
-GenericName=xkcd generator
+GenericName=Generate passphrases
 Comment=Generate secure passphrases
-TryExec=xkcd_generate.pl
-Exec=xkcd_generate.pl
+TryExec=xkcd-generate.pl
+Exec=xkcd-generate.pl
 Icon=xkcd-5-dollar-wrench.png
 Type=Application
 Terminal=false
