@@ -1,5 +1,7 @@
 #!/usr/bin/perl
-# Dave M <dave.nerd @ gmail>
+# Dave M <dave.nerd @ gmail>, 2016 -
+# https://dave-theunsub.github.io/xkcd-generate/
+# https://github.com/dave-theunsub/xkcd-generate/
 #
 # Sources:
 # https://xkcd.com/936/
@@ -22,7 +24,7 @@ use Getopt::Long;
 use Math::Random::MT::Auto 'irand';
 $| = 1;
 
-my $VERSION = '0.0.6';
+my $VERSION = '0.0.7';
 my @final_books;
 
 # We'll keep this up here to ensure folks can change it if need be
@@ -295,7 +297,7 @@ sub get_pseudo_keys {
         ],
         [
            'Quit', undef,
-           'Quit', '<control>X',
+           'Quit', '<control>Q',
            undef, sub { Gtk3->main_quit },
            FALSE
         ],
@@ -331,7 +333,7 @@ sub copy {
         warn "nothing in clipboard\n";
         return;
     }
-    my $pop = Gtk3::Popover->new( $label );
+    my $pop = Gtk3::Popover->new( );
     $pop->set_position( 'right' );
     $pop->set_relative_to( $final_label );
     $pop->show;
@@ -368,7 +370,7 @@ sub about {
     $dialog->set_version( $VERSION );
     $dialog->set_license( $license );
     $dialog->set_wrap_license( TRUE );
-    $dialog->set_website( 'https://github.com/dave-theunsub/xkcd-generate' );
+    $dialog->set_website( 'https://dave-theunsub.github.io/xkcd-generate/');
     $dialog->set_website_label( 'Homepage' );
     $dialog->set_logo( $pixbuf );
     $dialog->set_program_name( 'xkcd generate' );
