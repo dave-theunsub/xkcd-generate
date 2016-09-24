@@ -4,11 +4,11 @@ Last updated 24 Sept 2016
 This program was made for fun.  It may or may not be the right way to
 do things.
 
-https://dave-theunsub.github.io/xkcd-generate/ 
-https://github.com/dave-theunsub/xkcd-generate/
-
-Binaries for installation (rpm, deb, xz) are available there.
+https://dave-theunsub.github.io/xkcd-generate/   
+https://github.com/dave-theunsub/xkcd-generate/  
   
+Binaries for installation (rpm, deb, xz) are available there.
+      
 RPM installation  
   a. Get and import the key in one step  
   rpm --import https://davem.fedorapeople.org/RPM-GPG-KEY-DaveM-10-Sept-2016  
