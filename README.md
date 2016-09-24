@@ -34,7 +34,7 @@ Ubuntu / Debian install
   
   b.  sudo apt-get install -f  
   
-You can also verify the tarball.  Using 5.22 as the example version, ensure
+You can also verify the tarball.  Using 0.0.6 as the example version, ensure
 you have downloaded the tarball, its detached signature (.asc), and the key
 in step "a" above.  
   
@@ -47,7 +47,7 @@ in step "a" above.
   c. Verify  
   gpg2 --verify xkcd-generate-0.0.6.tar.xz.asc xkcd-generate-0.0.6.tar.xz  
   or  
-  gpg --verify clamtk-5.22.tar.gz.asc clamtk-5.22.tar.gz  
+  gpg --verify xkcd-generate-0.0.6.tar.xz.asc xkcd-generate-0.0.6.tar.xz  
   
   d. You should see something like this:  
   gpg: Signature made Sun 11 Sep 2016 06:29:41 AM CDT using RSA key ID  
