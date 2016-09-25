@@ -7,8 +7,6 @@
 # xkcd comic: https://xkcd.com/936/
 # Project Gutenberg: https://www.gutenberg.org
 # Perl: perl-List-MoreUtils
-# Perl: perl-Math-Random-Secure
-# Perl: perl-Math-Random-Auto
 # Perl: perl-Getopt-Long
 
 use strict;
@@ -16,12 +14,6 @@ use warnings;
 use Tie::File;
 use List::MoreUtils 'uniq';
 use Getopt::Long;
-
-# Pick one of these.  Some systems don't
-# have the first one (like CentOS), so use
-# the second one (MT::Auto).
-# use Math::Random::Secure 'irand';    # faster than rand
-use Math::Random::MT::Auto 'irand';
 $| = 1;
 
 my $VERSION = '0.0.7';
@@ -219,7 +211,7 @@ sub generate {
         }
     }
     if ( $use_numbers ) {
-        my $irand = irand( 100 ) + 1;
+        my $irand = rand( 100 ) + 1;
         $irand = sanity( $irand );
         $entry_5->set_text( $irand );
         $final_sofar .= ' ' . $irand;
@@ -333,7 +325,7 @@ sub copy {
         warn "nothing in clipboard\n";
         return;
     }
-    my $pop = Gtk3::Popover->new( );
+    my $pop = Gtk3::Popover->new();
     $pop->set_position( 'right' );
     $pop->set_relative_to( $final_label );
     my $label = Gtk3::Label->new( 'Copied!' );
@@ -373,7 +365,7 @@ sub about {
     $dialog->set_version( $VERSION );
     $dialog->set_license( $license );
     $dialog->set_wrap_license( TRUE );
-    $dialog->set_website( 'https://dave-theunsub.github.io/xkcd-generate/');
+    $dialog->set_website( 'https://dave-theunsub.github.io/xkcd-generate/' );
     $dialog->set_website_label( 'Homepage' );
     $dialog->set_logo( $pixbuf );
     $dialog->set_program_name( 'xkcd generate' );
