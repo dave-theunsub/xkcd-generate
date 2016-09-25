@@ -336,6 +336,9 @@ sub copy {
     my $pop = Gtk3::Popover->new( );
     $pop->set_position( 'right' );
     $pop->set_relative_to( $final_label );
+    my $label = Gtk3::Label->new( 'Copied!' );
+    $pop->add( $label );
+    $label->show;
     $pop->show;
     my $loop = Glib::MainLoop->new;
     Glib::Timeout->add(

@@ -7,4 +7,4 @@
 # 0.0.5 - add headerbar, remove $window title, remove unneeded warns
 # 0.0.6 - add keyboard shortcuts for Explain, About, and Quit - with images;
 #       - add man pages; add Copy button; add sexy popover
-# 0.0.7 - update homepage URL
+# 0.0.7 - update homepage URL; finish Popover with label
