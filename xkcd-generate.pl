@@ -4,12 +4,12 @@
 # https://github.com/dave-theunsub/xkcd-generate/
 #
 # Sources:
-# https://xkcd.com/936/
+# xkcd comic: https://xkcd.com/936/
 # Project Gutenberg: https://www.gutenberg.org
-# perl-List-MoreUtils
-# perl-Math-Random-Secure
-# perl-Math-Random-Auto
-# perl-Getopt-Long
+# Perl: perl-List-MoreUtils
+# Perl: perl-Math-Random-Secure
+# Perl: perl-Math-Random-Auto
+# Perl: perl-Getopt-Long
 
 use strict;
 use warnings;
