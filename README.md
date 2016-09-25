@@ -1,4 +1,4 @@
-# xkcd-generate
+# xkcd-generate, 2016 -  
 
 xkcd-generate creates pass phrases from novels and dictionaries, with options to add digits or special characters.   
   
@@ -12,8 +12,8 @@ Or just install it. :)
 https://dave-theunsub.github.io/xkcd-generate/  
 https://github.com/dave-theunsub/xkcd-generate/  
 https://gitlab.com/dave_m/xkcd-generate  
-  
-Binaries for installation (rpm, deb, xz) are available here:   
 https://bitbucket.org/dave_theunsub/xkcd-generate/  
+  
+Binaries for installation (rpm, deb, xz) are available there.  
   
 Dave M <dave.nerd @ gmail>, 2016 -  

@@ -8,3 +8,4 @@
 # 0.0.6 - add keyboard shortcuts for Explain, About, and Quit - with images;
 #       - add man pages; add Copy button; add sexy popover
 # 0.0.7 - update homepage URL; finish Popover with label; remove perl-Math-\*
+# 0.0.8 - add security badge icon

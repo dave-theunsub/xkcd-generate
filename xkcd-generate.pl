@@ -16,11 +16,13 @@ use List::MoreUtils 'uniq';
 use Getopt::Long;
 $| = 1;
 
-my $VERSION = '0.0.7';
+my $VERSION = '0.0.8';
 my @final_books;
 
 # We'll keep this up here to ensure folks can change it if need be
 my $book_location = '/usr/share/doc/xkcd-generate';
+# Debian uses this one:
+# my $book_location = '/usr/share/perl5/xkcd-generate';
 
 use Gtk3 '-init';
 use Glib 'TRUE', 'FALSE';
@@ -87,7 +89,7 @@ my $clippy
     = Gtk3::Clipboard::get( Gtk3::Gdk::Atom::intern( 'CLIPBOARD', FALSE ) );
 $clippy->wait_for_text();
 my $copy_btn = Gtk3::Button->new_from_icon_name( 'gtk-copy', 3 );
-$copy_btn->set_tooltip_text( 'Copy phrase <ctrl-C>' );
+$copy_btn->set_tooltip_text( 'Copy generated phrase <ctrl-C>' );
 
 my $grid = Gtk3::Grid->new;
 $box->pack_start( $grid, TRUE, TRUE, 5 );
