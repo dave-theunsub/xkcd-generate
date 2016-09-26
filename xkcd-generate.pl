@@ -307,7 +307,8 @@ sub explain {
     my $box        = Gtk3::Box->new( 'horizontal', 5 );
     $box->add( $image );
 
-    my $dialogbox = Gtk3::Dialog->new;
+    my $dialogbox = Gtk3::Dialog->new( '', $window, 'destroy-with-parent',
+        'gtk-close' => 'close' );
     $dialogbox->set_title( 'xkcd comic explanation' );
     $dialogbox->get_content_area()->add( $box );
     $dialogbox->show_all;
